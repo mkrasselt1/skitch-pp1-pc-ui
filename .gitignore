@@ -1,0 +1,23 @@
+# Hersteller-App: niemals ins Repository
+*.apk
+*.apkm
+*.xapk
+
+# Eigene Stickdateien und Entwürfe
+*.pes
+*.jef
+*.exp
+*.dst
+*.vp3
+*.xxx
+*.svg
+
+# Build
+/node_modules/
+/dist/
+
+# Lokale Einstellungen
+.claude/
+
+# Protokoll-Doku nur lokal
+/docs/

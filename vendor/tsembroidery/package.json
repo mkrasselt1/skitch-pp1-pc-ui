@@ -1,0 +1,65 @@
+{
+  "name": "@guillaumemmm/tsembroidery",
+  "version": "2.8.0",
+  "description": "Read and write PES, DST, JEF, EXP, VP3 and XXX embroidery files, render them as SVG, and turn flat SVG artwork into stitches.",
+  "keywords": [
+    "embroidery",
+    "pes",
+    "dst",
+    "jef",
+    "exp",
+    "vp3",
+    "xxx",
+    "janome",
+    "tajima",
+    "pec",
+    "brother",
+    "svg",
+    "stitch",
+    "pyembroidery"
+  ],
+  "type": "module",
+  "sideEffects": false,
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsup && tsc -p tsconfig.json --emitDeclarationOnly",
+    "test": "vitest run",
+    "typecheck": "tsc -p tsconfig.check.json",
+    "prepublishOnly": "npm run build && npm run typecheck && npm test"
+  },
+  "author": "guillaumemmm",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/GuillaumeMMM/tsembroidery.git"
+  },
+  "license": "MIT",
+  "devDependencies": {
+    "@types/node": "^24.13.6",
+    "happy-dom": "^20.14.5",
+    "tsup": "^8.5.1",
+    "typescript": "^7.0.2",
+    "vitest": "^5.0.1"
+  },
+  "dependencies": {
+    "clipper2-ts": "^2.0.1-18",
+    "colord": "^2.10.0",
+    "svg-pathdata": "^8.0.0"
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "homepage": "https://github.com/GuillaumeMMM/tsembroidery#readme",
+  "bugs": {
+    "url": "https://github.com/GuillaumeMMM/tsembroidery/issues"
+  }
+}

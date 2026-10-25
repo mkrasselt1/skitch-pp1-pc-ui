@@ -1,0 +1,78 @@
+{
+  "name": "clipper2-ts",
+  "version": "2.0.1-18",
+  "description": "TypeScript port of Clipper2 polygon clipping, boolean operations, offsetting, and triangulation library",
+  "type": "module",
+  "main": "dist/index.js",
+  "module": "dist/clipper2.min.mjs",
+  "types": "dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    }
+  },
+  "sideEffects": false,
+  "scripts": {
+    "build": "tsc && rolldown -c rolldown.config.ts",
+    "dev": "tsc --watch",
+    "test": "vitest --run",
+    "test:watch": "vitest --watch",
+    "test:ui": "vitest --ui",
+    "test:coverage": "vitest --coverage",
+    "benchmark": "vitest --run bench",
+    "lint": "eslint src/**/*.ts",
+    "lint:fix": "eslint src/**/*.ts --fix",
+    "serve": "npx serve .",
+    "prepublishOnly": "npm run build && npm test",
+    "prepare": "npm run build",
+    "predeploy": "npm run build && rm -rf .gh-pages && mkdir -p .gh-pages/dist && cp -r dist/* .gh-pages/dist/ && sed 's|../dist/|./dist/|g' example/index.html > .gh-pages/index.html",
+    "deploy": "gh-pages -d .gh-pages"
+  },
+  "keywords": [
+    "clipper",
+    "clipper2",
+    "polygon",
+    "clipping",
+    "offsetting",
+    "geometry",
+    "computational-geometry",
+    "boolean-operations",
+    "polygon-offset",
+    "minkowski",
+    "typescript"
+  ],
+  "author": "Angus Johnson (original C# version), TypeScript port by Jeremy Tribby",
+  "license": "BSL-1.0",
+  "homepage": "https://github.com/countertype/clipper2-ts#readme",
+  "bugs": {
+    "url": "https://github.com/countertype/clipper2-ts/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/countertype/clipper2-ts.git"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "engines": {
+    "node": ">=14.0.0"
+  },
+  "devDependencies": {
+    "@eslint/js": "^10.0.1",
+    "@types/node": "^24.10.1",
+    "@vitest/ui": "^4.0.10",
+    "eslint": "^10.0.1",
+    "gh-pages": "^6.3.0",
+    "rolldown": "^1.0.0-rc.3",
+    "typescript": "^5.0.0",
+    "typescript-eslint": "8.56.1-alpha.3",
+    "vitest": "^4.0.10"
+  },
+  "files": [
+    "dist/**/*",
+    "src/**/*",
+    "README.md",
+    "LICENSE"
+  ]
+}

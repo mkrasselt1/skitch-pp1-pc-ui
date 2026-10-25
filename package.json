@@ -1,0 +1,85 @@
+{
+  "name": "pp1-steuerung",
+  "productName": "PP1 Steuerung",
+  "version": "0.1.0",
+  "description": "PC-Steuerung für die Skitch PP1 Stickmaschine über Bluetooth",
+  "author": "mkrasselt1",
+  "license": "UNLICENSED",
+  "private": true,
+  "main": "electron/main.js",
+  "scripts": {
+    "start": "electron .",
+    "dist": "electron-builder --publish never"
+  },
+  "dependencies": {
+    "dbus-next": "0.10.2"
+  },
+  "devDependencies": {
+    "electron": "44.7.0",
+    "electron-builder": "26.17.0"
+  },
+  "build": {
+    "appId": "io.github.mkrasselt1.PP1Steuerung",
+    "productName": "PP1 Steuerung",
+    "directories": {
+      "buildResources": "build",
+      "output": "dist"
+    },
+    "files": [
+      "index.html",
+      "i18n.js",
+      "app.js",
+      "preview.js",
+      "pen.js",
+      "style.css",
+      "vendor/**",
+      "electron/**",
+      "package.json"
+    ],
+    "artifactName": "PP1-Steuerung-${version}-${os}-${arch}.${ext}",
+    "win": {
+      "target": [
+        {
+          "target": "nsis",
+          "arch": [
+            "x64"
+          ]
+        },
+        {
+          "target": "portable",
+          "arch": [
+            "x64"
+          ]
+        }
+      ]
+    },
+    "portable": {
+      "artifactName": "PP1-Steuerung-${version}-portable.exe"
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true
+    },
+    "linux": {
+      "target": [
+        "AppImage",
+        "flatpak"
+      ],
+      "category": "Utility",
+      "synopsis": "Skitch PP1 Stickmaschine über Bluetooth steuern"
+    },
+    "flatpak": {
+      "runtimeVersion": "24.08",
+      "baseVersion": "24.08",
+      "finishArgs": [
+        "--share=ipc",
+        "--socket=x11",
+        "--socket=wayland",
+        "--device=dri",
+        "--allow=bluetooth",
+        "--system-talk-name=org.bluez",
+        "--filesystem=home:ro"
+      ]
+    }
+  }
+}

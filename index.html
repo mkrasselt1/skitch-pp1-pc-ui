@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PP1</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <header class="topbar">
+        <h1>🧵 <span data-i18n="app.title">PP1 Steuerung</span></h1>
+        <div class="topbar-right">
+            <div class="conn">
+                <span class="status-dot" id="statusDot"></span>
+                <span id="statusText" data-i18n="conn.none">Nicht verbunden</span>
+            </div>
+            <select id="langSelect" data-i18n-title="lang.title" title="Sprache"></select>
+        </div>
+    </header>
+
+    <main class="layout">
+        <!-- Links: Bedienung -->
+        <aside class="controls">
+            <section class="card">
+                <h2 data-i18n="card.connection">Verbindung</h2>
+                <div class="row">
+                    <button class="btn primary" id="connectBtn" onclick="connectDevice()" data-i18n="btn.connect">Verbinden</button>
+                    <button class="btn" id="disconnectBtn" onclick="disconnect()" disabled data-i18n="btn.disconnect">Trennen</button>
+                </div>
+                <button class="btn wide" id="pairBtn" onclick="pairLinux()" hidden data-i18n="btn.pair">🔗 Maschine mit PC koppeln</button>
+                <p class="hint" id="bleHint"></p>
+            </section>
+
+            <section class="card">
+                <h2 data-i18n="card.file">Stickdatei</h2>
+                <div class="dropzone" id="dropZone" onclick="document.getElementById('previewFileInput').click()">
+                    <div class="dz-icon">📂</div>
+                    <strong data-i18n="drop.choose">Datei wählen oder hierher ziehen</strong>
+                    <span class="hint">.pes, .jef, .exp, .dst, .vp3, .xxx</span>
+                </div>
+                <input type="file" id="previewFileInput" accept=".pes,.jef,.exp,.dst,.vp3,.xxx" hidden>
+                <div id="fileInfo" class="file-info"></div>
+                <button class="btn wide needs-conn needs-file" id="uploadBtn" onclick="uploadCurrentFile()" disabled data-i18n="btn.upload">📤 Auf Maschine übertragen</button>
+            </section>
+
+            <section class="card">
+                <h2 data-i18n="card.machine">Maschine</h2>
+                <div class="machine-status">
+                    <span class="stat-label" data-i18n="label.status">Status</span>
+                    <strong id="machineStatus">–</strong>
+                    <span class="machine-error" id="machineError" hidden></span>
+                    <span class="machine-hint" id="machineHint" hidden></span>
+                </div>
+                <div class="grid2">
+                    <button class="btn go needs-conn" onclick="startSewing()" disabled data-i18n="btn.ready" data-i18n-title="btn.ready.title">▶ Bereit machen</button>
+                    <button class="btn needs-conn needs-file" onclick="trialRun()" disabled data-i18n="btn.trial" data-i18n-title="btn.trial.title">◎ Probelauf</button>
+                    <button class="btn needs-conn" onclick="resumeSewing()" disabled data-i18n="btn.resume">⏯ Fortsetzen</button>
+                    <button class="btn needs-conn" onclick="hoopAway()" disabled data-i18n="btn.hoop">⇱ Rahmen weg</button>
+                </div>            </section>
+
+            <section class="card">
+                <h2 data-i18n="card.jump">Springe zu Stich</h2>
+                <input type="range" id="stepSlider" min="0" max="0" value="0" disabled>
+                <div class="row">
+                    <input type="number" id="stepInput" min="1" placeholder="Stich-Nr." data-i18n-placeholder="jump.placeholder" disabled>
+                    <button class="btn needs-conn needs-file" id="jumpBtn" onclick="jumpToStep()" disabled data-i18n="btn.jump">Springen</button>
+                </div>
+                <p class="hint" data-i18n="jump.hint">Schieberegler oder Klick auf den Zeitstrahl wählt die Stelle aus.</p>
+                <p class="pin-hint" id="pinHint" hidden><span id="pinText"></span> <a href="#" id="pinLive" data-i18n="pin.live">Live anzeigen</a></p>
+            </section>
+
+            <section class="card">
+                <h2 data-i18n="card.log">Protokoll</h2>
+                <div class="log" id="log"></div>
+            </section>
+        </aside>
+
+        <!-- Rechts: Vorschau, Fortschritt, Zeitstrahl -->
+        <section class="preview-pane">
+            <div class="card preview-card">
+                <div class="preview-head">
+                    <h2 data-i18n="card.preview">Vorschau</h2>
+                    <div class="stats">
+                        <div><span class="stat-label" data-i18n="stat.progress">Fortschritt</span><span id="statPercent">–</span></div>
+                        <div><span class="stat-label" data-i18n="stat.stitch">Stich</span><span id="statStitch">–</span></div>
+                        <div><span class="stat-label" data-i18n="stat.elapsed">Vergangen</span><span id="statElapsed">–</span></div>
+                        <div><span class="stat-label" data-i18n="stat.remaining">Verbleibend</span><span id="statRemaining">–</span></div>
+                    </div>
+                </div>
+                <div class="canvas-wrap">
+                    <canvas id="previewCanvas"></canvas>
+                    <div class="empty" id="previewEmpty" data-i18n="preview.empty">Noch keine Datei geladen</div>
+                </div>
+                <div class="progress"><div class="progress-fill" id="progressFill"></div></div>
+                <div class="step-bar">
+                    <button class="btn small needs-file" id="prevColorBtn" data-i18n="step.prevColor" data-i18n-title="step.prevColor.title" disabled>⏮ Farbe</button>
+                    <button class="btn small needs-file" id="prevStepBtn" data-i18n="step.prevStitch" data-i18n-title="step.prevStitch.title" disabled>◀ Stich</button>
+                    <button class="btn small needs-file" id="simBtn" data-i18n="sim.start" disabled>▶ Simulation</button>
+                    <select id="simSpeed" data-i18n-title="sim.speed.title">
+                        <option value="1" data-i18n="sim.realtime">Echtzeit</option>
+                        <option value="10">10×</option>
+                        <option value="60" selected>60×</option>
+                        <option value="300">300×</option>
+                    </select>
+                    <button class="btn small needs-file" id="nextStepBtn" data-i18n="step.nextStitch" data-i18n-title="step.nextStitch.title" disabled>Stich ▶</button>
+                    <button class="btn small needs-file" id="nextColorBtn" data-i18n="step.nextColor" data-i18n-title="step.nextColor.title" disabled>Farbe ⏭</button>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="timeline-head">
+                    <h2 data-i18n="card.timeline">Zeitstrahl</h2>
+                    <span id="totalTime" class="total-time"></span>
+                </div>
+                <div class="timeline" id="timeline">
+                    <div class="timeline-track" id="timelineTrack"></div>
+                    <div class="timeline-playhead" id="timelinePlayhead"></div>
+                </div>
+                <div class="timeline-axis" id="timelineAxis"></div>
+                <table class="blocks">
+                    <thead><tr><th>#</th><th data-i18n="th.color">Farbe</th><th data-i18n="th.stitches">Stiche</th><th data-i18n="th.start">Start</th><th data-i18n="th.duration">Dauer</th></tr></thead>
+                    <tbody id="blockTable"></tbody>
+                </table>
+                <div class="estimate-settings">
+                    <label><span data-i18n="est.speed">Geschwindigkeit</span> <input type="number" id="spmInput" value="400" min="50" max="1500" step="10"> <span data-i18n="est.spm">Stiche/min</span></label>
+                    <label><span data-i18n="est.change">Fadenwechsel</span> <input type="number" id="changeInput" value="60" min="0" max="900" step="5"> s</label>                </div>
+                <p class="hint" data-i18n="est.hint">Die Zeiten sind Schätzungen aus Stichzahl ÷ Geschwindigkeit plus einer festen Pause je Fadenwechsel. Beide Werte sind Annahmen, du kannst sie an deine Maschine anpassen.</p>
+            </div>
+        </section>
+    </main>
+
+    <!-- Geräteauswahl für die Desktop-App (im Browser zeigt Chrome einen eigenen Dialog) -->
+    <dialog id="deviceDialog">
+        <h2 data-i18n="dialog.title">Maschine wählen</h2>
+        <p class="hint" data-i18n="dialog.searching">Suche nach Stickmaschinen in der Nähe…</p>
+        <div id="deviceList" class="device-list"></div>
+        <div class="row">
+            <button class="btn" id="deviceCancel" data-i18n="btn.cancel">Abbrechen</button>
+        </div>
+    </dialog>
+
+    <script type="importmap">
+    {
+        "imports": {
+            "@guillaumemmm/tsembroidery": "./vendor/tsembroidery/dist/index.js",
+            "colord": "./vendor/colord/index.mjs",
+            "colord/plugins/names": "./vendor/colord/plugins/names.mjs",
+            "clipper2-ts": "./vendor/clipper2-ts/dist/index.js",
+            "svg-pathdata": "./vendor/svg-pathdata/dist/index.js"
+        }
+    }
+    </script>
+    <script src="i18n.js"></script>
+    <script src="app.js"></script>
+    <script type="module" src="preview.js"></script>
+</body>
+</html>
