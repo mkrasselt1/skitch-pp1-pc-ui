@@ -1,7 +1,7 @@
 {
   "name": "pp1-steuerung",
   "productName": "PP1 Steuerung",
-  "version": "0.1.0",
+  "version": "1.0.0",
   "description": "PC-Steuerung für die Skitch PP1 Stickmaschine über Bluetooth",
   "author": "mkrasselt1",
   "license": "UNLICENSED",
